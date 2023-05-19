@@ -1,5 +1,9 @@
-#include<iostream>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
 using namespace std;
+
 // Globales
 const int n = 5, m = 3; // El profe nos pide n=6 hay que cambiarlo, esto es solo una base o 
 
@@ -12,17 +16,15 @@ void calcular_need(int need[n][m], int max[n][m], int alloc[n][m]) {
     }
 }
 
+// Aquí avaliable[j] es nuestro "work"
+// si need <= work return true
 bool comparar_need_work(int i, int need[n][m], int available[m]) {
-    bool isSafe = true;
     for (int j = 0; j < m; j++) {
-        // Aquí avaliable[j] es nuestro "work"
-        // work <= available
-        if (!(need[i][j] <= available[j])){ // si no es seguro break
-            isSafe = false;
-            break;
+        if (!(need[i][j] <= available[j])){ // need > work return false
+            return false;
         }
     }
-    return isSafe;
+    return true;
 }
 
 int main(void) {
@@ -46,23 +48,38 @@ int main(void) {
     };
     int available[m] = {3, 3, 2};
     int need[n][m];
-
+    vector<int> secuencia;
+    bool seguro = true;
+    // Obtener matriz need
     calcular_need(need, max, alloc);
 
     int index = 0;
-    while (need)
-    {
+    int aux = -1;
+    while (secuencia.size() < n) {
+        if(index >= n) index = 0;
+        // Si secuencia contiene index, entonces index++
+        if(find(secuencia.begin(), secuencia.end(), index) != secuencia.end()) {
+            aux = index;
+            index++;
+            continue;
+        }
+        // Si need <= available
         if(comparar_need_work(index, need, available)) {
             // work += alloc
             for (int j = 0; j < m; j++) {
                 available[j] += alloc[index][j];
             }
+            secuencia.push_back(index);
+        } else if(index == aux){
+            seguro = false;
+            break;
         }
+        aux = index;
         index++;
     }
-    
+
+    for (auto element : secuencia) {
+        cout << element << " ";
+    }
     exit(EXIT_SUCCESS);
 }
-
-
-
