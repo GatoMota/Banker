@@ -49,17 +49,24 @@ int main(void) {
     int available[m] = {3, 3, 2};
     int need[n][m];
     vector<int> secuencia;
-    bool seguro = true;
+    bool seguro;
+    bool pushed = true;
     // Obtener matriz need
     calcular_need(need, max, alloc);
 
     int index = 0;
-    int aux = -1;
     while (secuencia.size() < n) {
-        if(index >= n) index = 0;
+        if(index >= n) {
+            // Si no hubo push en la secuencia al haber recorrido todos los procesos, no es segura.
+            if(!pushed) {
+                seguro = false;
+                break;
+            }
+            index = 0;
+        }
+        pushed = false;
         // Si secuencia contiene index, entonces index++
         if(find(secuencia.begin(), secuencia.end(), index) != secuencia.end()) {
-            aux = index;
             index++;
             continue;
         }
@@ -69,17 +76,24 @@ int main(void) {
             for (int j = 0; j < m; j++) {
                 available[j] += alloc[index][j];
             }
+            // se agrega el proceso a la secuencia
             secuencia.push_back(index);
-        } else if(index == aux){
-            seguro = false;
+            pushed = true;
+        }
+        // Si el tamaño de secuencia es igual a n la secuencia es segura y termina el loop.
+        if(secuencia.size() == n) {
+            seguro = true;
             break;
         }
-        aux = index;
         index++;
     }
-
+    if(!seguro) {
+        cout << "No es segura" << endl;
+    } else {
+        cout << "Es segura" << endl;
+    }
     for (auto element : secuencia) {
-        cout << element << " ";
+        cout << "P" << element << ", ";
     }
     exit(EXIT_SUCCESS);
 }
